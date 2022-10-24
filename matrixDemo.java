@@ -1,9 +1,8 @@
 import java.lang.Math;
 import java.util.Arrays;
 
-import javax.naming.spi.DirStateFactory.Result;
-
 public class matrixDemo {
+    // private static int counter = 0;
     public static void main(String args[]) {
         int[][] matrix = {
             {1, 2, 3, 4},
@@ -32,24 +31,30 @@ public class matrixDemo {
         };
 
         int[][] resultMatrix = classicalMultiplication(matrix, matrix2);
-        // for(int row = 0; row < matrix3.length; row++)
-        // {
-        //     for(int col = 0; col < matrix3.length; col++)
-        //     {
-        //         System.out.println(matrix3[row][col]);
-        //     }
-        //     System.out.println();
-        // }
-
+        System.out.println("Classical Result: ");
+        for(int row = 0; row < resultMatrix.length; row++)
+        {
+            for(int col = 0; col < resultMatrix.length; col++)
+            {
+                System.out.print(resultMatrix[row][col] + " ");
+            }
+            System.out.println();
+        }
+        
         resultMatrix = naiveMultiplication(matrix, matrix2);
-        // for(int row = 0; row < matrix3.length; row++)
-        // {
-        //     for(int col = 0; col < matrix3.length; col++)
-        //     {
-        //         System.out.println(matrix3[row][col]);
-        //     }
-        //     System.out.println();
-        // }
+        System.out.println();
+
+        System.out.println("Naive Result: ");
+        for(int row = 0; row < resultMatrix.length; row++)
+        {
+            for(int col = 0; col < resultMatrix.length; col++)
+            {
+                System.out.print(resultMatrix[row][col] + " ");
+            }
+            System.out.println();
+        }
+        
+        // System.out.println("\nCounter: " + counter);
 
     }
 
@@ -91,6 +96,7 @@ public class matrixDemo {
         int[][] result = new int[size][size];
         int middle = (int) Math.floor(size/2);
 
+        // splitting into 4 quadrants
         int[][] a1 = new int[middle][middle];
         int[][] a2 = new int[middle][middle];
         int[][] a3 = new int[middle][middle];
@@ -118,45 +124,40 @@ public class matrixDemo {
             b3[row] = Arrays.copyOfRange(m2[row+middle], 0, middle);
             b4[row] = Arrays.copyOfRange(m2[row+middle], middle, size);
         }
-        System.out.println("Quadrant 1:");
-        for(int row = 0; row < a1.length; row++)
+
+        // counter++;
+        for(int row = 0; row < middle; row++)
         {
-            for(int col = 0; col < a1[0].length; col++)
+            for(int col = 0; col < middle; col++)
             {
-                System.out.print(a1[row][col]);
+                c1[row][col] = naiveMultiplication(a1, b1)[row][col] + naiveMultiplication(a2, b3)[row][col];  
+                c2[row][col] = naiveMultiplication(a1, b2)[row][col] + naiveMultiplication(a2, b4)[row][col]; 
+                c3[row][col] = naiveMultiplication(a3, b1)[row][col] + naiveMultiplication(a4, b3)[row][col]; 
+                c4[row][col] = naiveMultiplication(a3, b2)[row][col] + naiveMultiplication(a4, b4)[row][col];              
             }
-            System.out.println();
         }
-        System.out.println();
-        System.out.println("Quadrant 2:");
-        for(int row = 0; row < a2.length; row++)
+
+        for(int row = 0; row < middle; row++)
         {
-            for(int col = 0; col < a2[0].length; col++)
+            for(int col = 0; col < middle; col++)
             {
-                System.out.print(a2[row][col]);
+                result[row][col] = c1[row][col];
+                result[row][col + middle] = c2[row][col];
+                result[row + middle][col] = c3[row][col];
+                result[row + middle][col + middle] = c4[row][col];        
             }
-            System.out.println();
         }
-        System.out.println();
-        System.out.println("Quadrant 3:");
-        for(int row = 0; row < a3.length; row++)
-        {
-            for(int col = 0; col < a3[0].length; col++)
-            {
-                System.out.print(a3[row][col]);
-            }
-            System.out.println();
-        }
-        System.out.println();
-        System.out.println("Quadrant 4:");
-        for(int row = 0; row < a4.length; row++)
-        {
-            for(int col = 0; col < a4[0].length; col++)
-            {
-                System.out.print(a4[row][col]);
-            }
-            System.out.println();
-        }
+
+        // System.out.println("Result: " + counter);
+        // for(int row = 0; row < result.length; row++)
+        // {
+        //     for(int col = 0; col < result[0].length; col++)
+        //     {
+        //         System.out.print(result[row][col] + " ");
+        //     }
+        //     System.out.println();
+        // }
+        // System.out.println();
 
         return result;
     }
