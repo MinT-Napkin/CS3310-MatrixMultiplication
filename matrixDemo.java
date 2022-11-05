@@ -34,7 +34,7 @@ public class matrixDemo {
         // System.out.println("That took " + (endTime - startTime) + " milliseconds");
         
         long startTime = System.nanoTime();
-        int[][] resultMatrix = classicalMultiplication(matrix, matrix2);
+        int[][] resultMatrix = classicalMultiplication(matrix3, matrix4);
         long endTime = System.nanoTime();
         long elapsedTime = endTime - startTime;
 
@@ -51,7 +51,7 @@ public class matrixDemo {
         System.out.println();
         
         startTime = System.nanoTime();
-        resultMatrix = naiveMultiplication(matrix, matrix2);
+        resultMatrix = naiveMultiplication(matrix3, matrix4, 3);
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
 
@@ -135,13 +135,24 @@ public class matrixDemo {
         return result;
     }
 
-    public static int[][] naiveMultiplication(int m1[][], int m2[][]){
+    public static int[][] naiveMultiplication(int a_m1[][], int a_m2[][], int a_originalSize){
 
-        if(m1.length == 1 || m2.length == 1)
+        if(a_m1.length == 1 || a_m2.length == 1)
         {
             int[][] r = new int[1][1];
-            r[0][0] = m1[0][0]*m2[0][0]; 
+            r[0][0] = a_m1[0][0]*a_m2[0][0]; 
             return r;
+        }
+
+        int[][] m1 = a_m1;
+        int[][] m2 = a_m2;
+        int originalSize = a_originalSize;
+
+        if(!isPowerOfTwo(a_m1.length) || !isPowerOfTwo(a_m2.length))
+        {
+            m1 = extendMatrix(a_m1);
+            m2 = extendMatrix(a_m2);
+            originalSize = m1.length;
         }
 
         int size = m1.length;
@@ -182,10 +193,10 @@ public class matrixDemo {
         {
             for(int col = 0; col < middle; col++)
             {
-                c1[row][col] = naiveMultiplication(a1, b1)[row][col] + naiveMultiplication(a2, b3)[row][col];  
-                c2[row][col] = naiveMultiplication(a1, b2)[row][col] + naiveMultiplication(a2, b4)[row][col]; 
-                c3[row][col] = naiveMultiplication(a3, b1)[row][col] + naiveMultiplication(a4, b3)[row][col]; 
-                c4[row][col] = naiveMultiplication(a3, b2)[row][col] + naiveMultiplication(a4, b4)[row][col];              
+                c1[row][col] = naiveMultiplication(a1, b1, originalSize)[row][col] + naiveMultiplication(a2, b3, originalSize)[row][col];  
+                c2[row][col] = naiveMultiplication(a1, b2, originalSize)[row][col] + naiveMultiplication(a2, b4, originalSize)[row][col]; 
+                c3[row][col] = naiveMultiplication(a3, b1, originalSize)[row][col] + naiveMultiplication(a4, b3, originalSize)[row][col]; 
+                c4[row][col] = naiveMultiplication(a3, b2, originalSize)[row][col] + naiveMultiplication(a4, b4, originalSize)[row][col];              
             }
         }
 
@@ -200,6 +211,13 @@ public class matrixDemo {
             }
         }
 
+        int[][] finalResult = result;
+
+        if(result.length == originalSize)
+        {
+            finalResult = trimMatrix(result);
+        }
+
         // System.out.println("Result: " + counter);
         // for(int row = 0; row < result.length; row++)
         // {
@@ -211,7 +229,7 @@ public class matrixDemo {
         // }
         // System.out.println();
 
-        return result;
+        return finalResult;
     }
 
     public static int[][] strassenMultiplication(int m1[][], int m2[][]){
@@ -266,6 +284,7 @@ public class matrixDemo {
     public static int[][] trimMatrix(int[][] matrix)
     {
         int size = matrix.length;
+        boolean isExtended = false;
 
         // Detects a rows of 0's, which is the point of extension
         for (int i = 0; i < matrix.length; i++) {
@@ -277,8 +296,14 @@ public class matrixDemo {
                 else if (j == matrix.length-1)
                 {
                     size = i;
+                    isExtended = true;
                 }
             }
+        }
+
+        if(!isExtended)
+        {
+            return matrix;
         }
 
         int[][] result = new int[size][size];
