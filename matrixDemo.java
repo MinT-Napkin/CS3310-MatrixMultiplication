@@ -98,13 +98,13 @@ public class matrixDemo {
          * TESTING EMPIRICAL RUNTIME OF ALGORITHMS HERE
          */
 
-        int sizeN = 20;
+        final int sizeN = 4;
         int[][] randomMatrix1 = populateRandom2DMatrix(sizeN, sizeN);
         int[][] randomMatrix2 = populateRandom2DMatrix(sizeN, sizeN);
 
         System.out.println("TESTING RUNTIME : Random Matrices of Size " + sizeN + "\n");
 
-        long initialAttempts = 1;
+        final long initialAttempts = 10;
         long attempts = initialAttempts;
 
         long classicalAvg = 0;
@@ -350,7 +350,7 @@ public class matrixDemo {
         return result;
     }
 
-    /* Helper functions for Strassen Algorithm */
+    /* Helper functions for Naive DC algorithm and Strassen algorithm */
     // Adding 2 matrices
     public static int[][] addMatrices(int[][] a, int[][] b) {
         int n = a.length;
@@ -395,6 +395,8 @@ public class matrixDemo {
     /*
      * TESTING FUNCTIONS
      */
+
+    // prints out a matrix
     public static void printMatrix(int [][] matrix)
     {
         for(int row = 0; row < matrix.length; row++)
@@ -409,6 +411,7 @@ public class matrixDemo {
         System.out.println();
     }
 
+    // returns a 2d matrix with random numbers of specified size
     public static int[][] populateRandom2DMatrix(int n1, int n2)
     {
         Random rand = new Random();
