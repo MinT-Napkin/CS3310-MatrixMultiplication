@@ -1,5 +1,3 @@
-import java.lang.Math;
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -38,7 +36,7 @@ public class matrixDemo {
         printMatrix(resultMatrix);
         
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(naiveMultiplication(matrix1, matrix2));
+        resultMatrix = naiveMultiplication(matrix1, matrix2);
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
 
@@ -46,17 +44,11 @@ public class matrixDemo {
         printMatrix(resultMatrix);
 
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(r_strassenMultiply(matrix1, matrix2));
+        resultMatrix = r_strassenMultiply(matrix1, matrix2);
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
         System.out.println("Strassen Algorithm Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
-        
-        // System.out.println("That took " + (endTime - startTime) + " milliseconds");
-        startTime = System.nanoTime();
-        resultMatrix = classicalMultiplication(matrix1, matrix2);
-        endTime = System.nanoTime();
-        elapsedTime = endTime - startTime;
 
         /*
          * TESTING MATRICES THAT ARE OF SIZE THAT AREN'T POWER OF 2
@@ -87,7 +79,7 @@ public class matrixDemo {
         printMatrix(resultMatrix);
         
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(naiveMultiplication(matrix3, matrix4));
+        resultMatrix = naiveMultiplication(matrix3, matrix4);
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
 
@@ -95,7 +87,7 @@ public class matrixDemo {
         printMatrix(resultMatrix);
 
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(strassenMultiply(matrix3, matrix4));
+        resultMatrix = strassenMultiply(matrix3, matrix4);
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
 
@@ -106,19 +98,18 @@ public class matrixDemo {
          * TESTING EMPIRICAL RUNTIME OF ALGORITHMS HERE
          */
 
-        // Note: very slow if sizeN > 8
-        int sizeN = 10;
+        int sizeN = 20;
         int[][] randomMatrix1 = populateRandom2DMatrix(sizeN, sizeN);
         int[][] randomMatrix2 = populateRandom2DMatrix(sizeN, sizeN);
 
         System.out.println("TESTING RUNTIME : Random Matrices of Size " + sizeN + "\n");
 
-        int initialAttempts = 2;
-        int attempts = initialAttempts;
+        long initialAttempts = 1;
+        long attempts = initialAttempts;
 
-        double classicalAvg = 0;
-        double naiveAvg = 0;
-        double strassenAvg = 0;
+        long classicalAvg = 0;
+        long naiveAvg = 0;
+        long strassenAvg = 0;
         
         System.out.println("-----BEGINNING TEST-----\n");
         while(attempts > 0)
@@ -155,9 +146,9 @@ public class matrixDemo {
         naiveAvg /= initialAttempts;
         strassenAvg /= initialAttempts;
 
-        System.out.printf("Classical Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) classicalAvg);
-        System.out.printf("Naive DC Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) naiveAvg);
-        System.out.printf("Strassen Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) strassenAvg);
+        System.out.printf("Classical Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, classicalAvg);
+        System.out.printf("Naive DC Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, naiveAvg);
+        System.out.printf("Strassen Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, strassenAvg);
     }
 
     /*
@@ -199,80 +190,71 @@ public class matrixDemo {
         {
             a = extendMatrix(a);
             b = extendMatrix(b);
+
         }
         
         int[][] result = trimMatrix(r_naiveMultiplication(a, b));
-
+        
         return result;
     }
 
-    public static int[][] r_naiveMultiplication(int a_m1[][], int a_m2[][]){
+    public static int[][] r_naiveMultiplication(int m1[][], int m2[][]){
 
-        if(a_m1.length == 1 || a_m2.length == 1)
+        if(m1.length == 1 || m2.length == 1)
         {
             int[][] r = new int[1][1];
-            r[0][0] = a_m1[0][0]*a_m2[0][0]; 
+            r[0][0] = m1[0][0]*m2[0][0]; 
             return r;
         }
 
-        int[][] m1 = a_m1;
-        int[][] m2 = a_m2;
-
         int size = m1.length;
         int[][] result = new int[size][size];
-        int middle = (int) Math.floor(size/2);
+        int middle = size/2;
 
-        // splitting into 4 quadrants
+        // first matrix
         int[][] a1 = new int[middle][middle];
         int[][] a2 = new int[middle][middle];
         int[][] a3 = new int[middle][middle];
         int[][] a4 = new int[middle][middle];
 
+        // second matrix
         int[][] b1 = new int[middle][middle];
         int[][] b2 = new int[middle][middle];
         int[][] b3 = new int[middle][middle];
         int[][] b4 = new int[middle][middle];
 
+        // result matrix
         int[][] c1 = new int[middle][middle];
         int[][] c2 = new int[middle][middle];
         int[][] c3 = new int[middle][middle];
         int[][] c4 = new int[middle][middle];
 
-        for(int row = 0; row < middle; row++)
-        {
-            a1[row] = Arrays.copyOfRange(m1[row], 0, middle);
-            a2[row] = Arrays.copyOfRange(m1[row], middle, size);
-            a3[row] = Arrays.copyOfRange(m1[row+middle], 0, middle);
-            a4[row] = Arrays.copyOfRange(m1[row+middle], middle, size);
+        // dividing matrix A into 4 parts
+        divideArray(m1, a1, 0, 0);
+        divideArray(m1, a2, 0, size / 2);
+        divideArray(m1, a3, size / 2, 0);
+        divideArray(m1, a4, size / 2, size / 2);
 
-            b1[row] = Arrays.copyOfRange(m2[row], 0, middle);
-            b2[row] = Arrays.copyOfRange(m2[row], middle, size);
-            b3[row] = Arrays.copyOfRange(m2[row+middle], 0, middle);
-            b4[row] = Arrays.copyOfRange(m2[row+middle], middle, size);
-        }
+        // dividing matrix B into 4 parts
+        divideArray(m2, b1, 0, 0);
+        divideArray(m2, b2, 0, size / 2);
+        divideArray(m2, b3, size / 2, 0);
+        divideArray(m2, b4, size / 2, size / 2);
 
-        for(int row = 0; row < middle; row++)
-        {
-            for(int col = 0; col < middle; col++)
-            {
-                c1[row][col] = r_naiveMultiplication(a1, b1)[row][col] + r_naiveMultiplication(a2, b3)[row][col];  
-                c2[row][col] = r_naiveMultiplication(a1, b2)[row][col] + r_naiveMultiplication(a2, b4)[row][col]; 
-                c3[row][col] = r_naiveMultiplication(a3, b1)[row][col] + r_naiveMultiplication(a4, b3)[row][col]; 
-                c4[row][col] = r_naiveMultiplication(a3, b2)[row][col] + r_naiveMultiplication(a4, b4)[row][col];              
-            }
-        }
+        /*
+         * 
+         */
+        c1 = addMatrices(r_naiveMultiplication(a1, b1), r_naiveMultiplication(a2, b3));
+        c2 = addMatrices(r_naiveMultiplication(a1, b2), r_naiveMultiplication(a2, b4));
+        c3 = addMatrices(r_naiveMultiplication(a3, b1), r_naiveMultiplication(a4, b3));
+        c4 = addMatrices(r_naiveMultiplication(a3, b2), r_naiveMultiplication(a4, b4));
 
-        for(int row = 0; row < middle; row++)
-        {
-            for(int col = 0; col < middle; col++)
-            {
-                result[row][col] = c1[row][col];
-                result[row][col + middle] = c2[row][col];
-                result[row + middle][col] = c3[row][col];
-                result[row + middle][col + middle] = c4[row][col];        
-            }
-        }
-
+        // adding all subarray back into one
+        copySubArray(c1, result, 0, 0);
+        copySubArray(c2, result, 0, size / 2);
+        copySubArray(c3, result, size / 2, 0);
+        copySubArray(c4, result, size / 2, size / 2);
+        
         return result;
     }
 
