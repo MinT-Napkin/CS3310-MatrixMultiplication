@@ -50,7 +50,7 @@ public class matrixDemo {
         matrix1 = extendMatrix(matrix1);
         matrix2 = extendMatrix(matrix2);
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(StrassenMultiply(matrix1, matrix2));
+        resultMatrix = trimMatrix(r_strassenMultiply(matrix1, matrix2));
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
         matrix1 = trimMatrix(matrix1);
@@ -93,26 +93,18 @@ public class matrixDemo {
         System.out.println("Classical Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
         
-        matrix3 = extendMatrix(matrix3);
-        matrix4 = extendMatrix(matrix4);
         startTime = System.nanoTime();
         resultMatrix = trimMatrix(naiveMultiplication(matrix3, matrix4));
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        matrix3 = trimMatrix(matrix3);
-        matrix4 = trimMatrix(matrix4);
 
         System.out.println("Naive DC Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
 
-        matrix3 = extendMatrix(matrix3);
-        matrix4 = extendMatrix(matrix4);
         startTime = System.nanoTime();
-        resultMatrix = trimMatrix(StrassenMultiply(matrix3, matrix4));
+        resultMatrix = trimMatrix(strassenMultiply(matrix3, matrix4));
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        matrix3 = trimMatrix(matrix3);
-        matrix4 = trimMatrix(matrix4);
 
         System.out.println("Strassen Algorithm Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
@@ -157,7 +149,23 @@ public class matrixDemo {
     }
 
     /* Naive Divide and Conquer Matrix Multiplication (Minh) */
-    public static int[][] naiveMultiplication(int a_m1[][], int a_m2[][]){
+    public static int[][] naiveMultiplication(int A[][], int B[][])
+    {
+        int[][] a = A;
+        int[][] b = B;
+
+        if(!isPowerOfTwo(A.length) || !isPowerOfTwo(B.length))
+        {
+            a = extendMatrix(a);
+            b = extendMatrix(b);
+        }
+        
+        int[][] result = trimMatrix(r_naiveMultiplication(a, b));
+
+        return result;
+    }
+
+    public static int[][] r_naiveMultiplication(int a_m1[][], int a_m2[][]){
 
         if(a_m1.length == 1 || a_m2.length == 1)
         {
@@ -206,10 +214,10 @@ public class matrixDemo {
         {
             for(int col = 0; col < middle; col++)
             {
-                c1[row][col] = naiveMultiplication(a1, b1)[row][col] + naiveMultiplication(a2, b3)[row][col];  
-                c2[row][col] = naiveMultiplication(a1, b2)[row][col] + naiveMultiplication(a2, b4)[row][col]; 
-                c3[row][col] = naiveMultiplication(a3, b1)[row][col] + naiveMultiplication(a4, b3)[row][col]; 
-                c4[row][col] = naiveMultiplication(a3, b2)[row][col] + naiveMultiplication(a4, b4)[row][col];              
+                c1[row][col] = r_naiveMultiplication(a1, b1)[row][col] + r_naiveMultiplication(a2, b3)[row][col];  
+                c2[row][col] = r_naiveMultiplication(a1, b2)[row][col] + r_naiveMultiplication(a2, b4)[row][col]; 
+                c3[row][col] = r_naiveMultiplication(a3, b1)[row][col] + r_naiveMultiplication(a4, b3)[row][col]; 
+                c4[row][col] = r_naiveMultiplication(a3, b2)[row][col] + r_naiveMultiplication(a4, b4)[row][col];              
             }
         }
 
@@ -227,8 +235,24 @@ public class matrixDemo {
         return result;
     }
 
-    /* Strassen's Algorithm to Matrix Multiplication (Aether) */
-    private static int[][] StrassenMultiply(int[][] A, int[][] B) {
+    private static int[][] strassenMultiply(int[][] A, int[][] B)
+    {
+        int[][] a = A;
+        int[][] b = B;
+
+        if(!isPowerOfTwo(A.length) || !isPowerOfTwo(B.length))
+        {
+            a = extendMatrix(a);
+            b = extendMatrix(b);
+        }
+        
+        int[][] result = trimMatrix(r_strassenMultiply(a, b));
+
+        return result;
+    }
+
+    /* Strassen's Algorithm to Matrix Multiplication (Priyanshu) */
+    private static int[][] r_strassenMultiply(int[][] A, int[][] B) {
 
         int n = A.length;
 
@@ -273,13 +297,13 @@ public class matrixDemo {
              p7 = (b - d) (g + h)
              **/
 
-            int[][] p1 = StrassenMultiply(addMatrices(a, d), addMatrices(e, h));
-            int[][] p2 = StrassenMultiply(addMatrices(c,d),e);
-            int[][] p3 = StrassenMultiply(a, subMatrices(f, h));
-            int[][] p4 = StrassenMultiply(d, subMatrices(g, e));
-            int[][] p5 = StrassenMultiply(addMatrices(a,b), h);
-            int[][] p6 = StrassenMultiply(subMatrices(c, a), addMatrices(e, f));
-            int[][] p7 = StrassenMultiply(subMatrices(b, d), addMatrices(g, h));
+            int[][] p1 = r_strassenMultiply(addMatrices(a, d), addMatrices(e, h));
+            int[][] p2 = r_strassenMultiply(addMatrices(c,d),e);
+            int[][] p3 = r_strassenMultiply(a, subMatrices(f, h));
+            int[][] p4 = r_strassenMultiply(d, subMatrices(g, e));
+            int[][] p5 = r_strassenMultiply(addMatrices(a,b), h);
+            int[][] p6 = r_strassenMultiply(subMatrices(c, a), addMatrices(e, f));
+            int[][] p7 = r_strassenMultiply(subMatrices(b, d), addMatrices(g, h));
 
 
             /**
