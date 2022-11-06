@@ -41,21 +41,14 @@ public class matrixDemo {
         resultMatrix = trimMatrix(naiveMultiplication(matrix1, matrix2));
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        matrix1 = trimMatrix(matrix1);
-        matrix2 = trimMatrix(matrix2);
 
         System.out.println("Naive DC Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
 
-        matrix1 = extendMatrix(matrix1);
-        matrix2 = extendMatrix(matrix2);
         startTime = System.nanoTime();
         resultMatrix = trimMatrix(r_strassenMultiply(matrix1, matrix2));
         endTime = System.nanoTime();
         elapsedTime = endTime - startTime;
-        matrix1 = trimMatrix(matrix1);
-        matrix2 = trimMatrix(matrix2);
-
         System.out.println("Strassen Algorithm Matrix Result: (Execution Time: " + (elapsedTime) + " nanoseconds)");
         printMatrix(resultMatrix);
         
@@ -110,13 +103,61 @@ public class matrixDemo {
         printMatrix(resultMatrix);
 
         /*
-         * TESTING RUNTIME OF ALGORITHMS HERE
+         * TESTING EMPIRICAL RUNTIME OF ALGORITHMS HERE
          */
 
+        // Note: very slow if sizeN > 8
         int sizeN = 10;
-        int[][] randomMatrix = populateRandom2DMatrix(sizeN, sizeN);
+        int[][] randomMatrix1 = populateRandom2DMatrix(sizeN, sizeN);
+        int[][] randomMatrix2 = populateRandom2DMatrix(sizeN, sizeN);
 
-        // printMatrix(randomMatrix);
+        System.out.println("TESTING RUNTIME : Random Matrices of Size " + sizeN + "\n");
+
+        int initialAttempts = 2;
+        int attempts = initialAttempts;
+
+        double classicalAvg = 0;
+        double naiveAvg = 0;
+        double strassenAvg = 0;
+        
+        System.out.println("-----BEGINNING TEST-----\n");
+        while(attempts > 0)
+        {
+            System.out.print(attempts + " ");
+            attempts--;
+            startTime = System.nanoTime();
+            classicalMultiplication(randomMatrix1, randomMatrix2);
+            endTime = System.nanoTime();
+            elapsedTime = endTime - startTime;
+            classicalAvg += elapsedTime;
+
+            System.out.print("Classical complete . . . ");
+
+            startTime = System.nanoTime();
+            naiveMultiplication(randomMatrix1, randomMatrix2);
+            endTime = System.nanoTime();
+            elapsedTime = endTime - startTime;
+            naiveAvg += elapsedTime;
+
+            System.out.print("Naive complete . . . ");
+
+            startTime = System.nanoTime();
+            strassenMultiply(randomMatrix1, randomMatrix2);
+            endTime = System.nanoTime();
+            elapsedTime = endTime - startTime;
+            strassenAvg += elapsedTime;
+
+            System.out.print("Strassen complete . . . \n");
+        }
+        System.out.println("\n-----END TEST-----\n");
+        
+        classicalAvg /= initialAttempts;
+        naiveAvg /= initialAttempts;
+        strassenAvg /= initialAttempts;
+
+        System.out.printf("Classical Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) classicalAvg);
+        System.out.printf("Naive DC Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) naiveAvg);
+        System.out.printf("Strassen Matrix Multipliation Average Time (Size %d): %d nanosecs\n", sizeN, (int) strassenAvg);
     }
 
     /*
@@ -396,14 +437,7 @@ public class matrixDemo {
         for (int row = 0; row < result.length; row++) {
             for(int col = 0; col < result.length; col++)
             {
-                if(randNum == 0)
-                {
-                    col--;
-                }
-                else
-                {
-                    result [row][col] = randNum;
-                }
+                result [row][col] = randNum;
                 randNum = rand.nextInt(19) - 9;
             }
         }
